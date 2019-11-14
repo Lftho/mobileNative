@@ -77,7 +77,7 @@ export const ProfileButton = styled(RectButton)`
   align-items: center;
   height: 36px;
 
-  opacity: ${props => (props.loading ? 0.7 : 1)};
+  opacity: ${props => (props.loading ? 0.8 : 1)};
 `;
 
 export const ProfileButtonŦext = styled.Text`
