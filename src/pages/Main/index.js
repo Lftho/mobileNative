@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Keyboard, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import api from '../../services/api';
 
@@ -18,11 +20,37 @@ import {
 } from './styles';
 
 export default class Main extends Component {
+  static navigationOptions = {
+    title: 'Usuários',
+  };
+
+  static PropTypes = {
+    navigation: PropTypes.shape({
+      navigate: PropTypes.func,
+    }).isRequired,
+  };
+
   state = {
     newUser: '',
     users: [],
     loading: false,
   };
+
+  async componentDidMount() {
+    const users = await AsyncStorage.getItem('users');
+
+    if (users) {
+      this.setState({ users: JSON.parse(users) });
+    }
+  }
+
+  componentDidUpdate(_, preveState) {
+    const { users } = this.state;
+
+    if (preveState.users !== users) {
+      AsyncStorage.setItem('users', JSON.stringify(users));
+    }
+  }
 
   handleAddUser = async () => {
     // Listando o usuário do github
@@ -58,6 +86,13 @@ export default class Main extends Component {
     });
 
     Keyboard.dismiss();
+  };
+
+  handleNavigate = user => {
+    // Construindo a navegação
+    const { navigation } = this.props;
+
+    navigation.navigate('User', { user });
   };
 
   render() {
@@ -103,7 +138,7 @@ export default class Main extends Component {
               <Name>{item.name}</Name>
               <Bio>{item.bio}</Bio>
 
-              <ProfileButton onPress={() => {}}>
+              <ProfileButton onPress={() => this.handleNavigate(item)}>
                 <ProfileButtonŦext>Ver Perfil</ProfileButtonŦext>
               </ProfileButton>
             </User>
@@ -113,7 +148,3 @@ export default class Main extends Component {
     );
   }
 }
-
-Main.navigationOptions = {
-  title: 'Usuários',
-};
